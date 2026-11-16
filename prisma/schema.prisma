@@ -1,0 +1,194 @@
+// Shunkhlai Fuel Monitor — Prisma schema (PostgreSQL / Neon)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Neon: pooled URL in DATABASE_URL, direct URL for migrations.
+  directUrl = env("DIRECT_URL")
+}
+
+enum Language {
+  mn
+  en
+}
+
+enum NotificationType {
+  A92_AVAILABLE // unavailable -> available transition
+  A92_ARRIVAL_TIME // station reported a new arrival time
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+  SKIPPED
+}
+
+/// Anonymous browser-bound user (signed cookie). `email` reserved for future auth.
+model User {
+  id        String   @id @default(uuid())
+  email     String?  @unique
+  createdAt DateTime @default(now())
+
+  preference    UserPreference?
+  telegram      TelegramConnection?
+  tokens        TelegramConnectionToken[]
+  favorites     FavoriteStation[]
+  notifications NotificationHistory[]
+}
+
+model UserPreference {
+  id                           String   @id @default(uuid())
+  userId                       String   @unique
+  latitude                     Float?
+  longitude                    Float?
+  district                     String   @default("BZD")
+  notificationRadiusKm         Float    @default(5)
+  telegramNotificationsEnabled Boolean  @default(true)
+  notifyOnAvailable            Boolean  @default(true)
+  notifyOnArrivalTime          Boolean  @default(true)
+  favoritesOnly                Boolean  @default(false)
+  language                     Language @default(mn)
+  updatedAt                    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TelegramConnection {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  chatId           BigInt   @unique
+  telegramUsername String?
+  firstName        String?
+  connectedAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TelegramConnectionToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model FuelStation {
+  id                 String    @id @default(uuid())
+  externalId         String    @unique
+  name               String
+  rawName            String
+  address            String?
+  district           String? // district code, e.g. BZD
+  latitude           Float?
+  longitude          Float?
+  coordinateVerified Boolean   @default(false)
+  coordinateSource   String?
+  lastSeenAt         DateTime? // last sync in which this station had a valid ai92 record
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  availability  FuelAvailability[]
+  events        AvailabilityEvent[]
+  favorites     FavoriteStation[]
+  notifications NotificationHistory[]
+
+  @@index([district])
+}
+
+/// Append-only history: a row is inserted only when the fuel state changes.
+model FuelAvailability {
+  id             String   @id @default(uuid())
+  stationId      String
+  fuelType       String // "ai92" (Euro-92 intentionally not tracked)
+  available      Boolean
+  arrivedAt      String? // "HH:mm" local time as reported by source
+  emptyAt        String?
+  limitPerPerson String?
+  recordedAt     DateTime @default(now())
+
+  station FuelStation @relation(fields: [stationId], references: [id], onDelete: Cascade)
+
+  @@index([stationId, fuelType, recordedAt(sort: Desc)])
+}
+
+/// A meaningful change worth notifying about. `key` makes detection idempotent.
+model AvailabilityEvent {
+  id         String           @id @default(uuid())
+  key        String           @unique
+  stationId  String
+  fuelType   String
+  type       NotificationType
+  arrivedAt  String?
+  createdAt  DateTime         @default(now())
+
+  station       FuelStation           @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  notifications NotificationHistory[]
+
+  @@index([createdAt])
+}
+
+model NotificationHistory {
+  id               String             @id @default(uuid())
+  userId           String
+  stationId        String
+  eventId          String
+  fuelType         String
+  notificationType NotificationType
+  status           NotificationStatus @default(PENDING)
+  error            String?
+  distanceKm       Float?
+  createdAt        DateTime           @default(now())
+  sentAt           DateTime?
+
+  user    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  station FuelStation       @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  event   AvailabilityEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  // One notification per user per event => no duplicates even with concurrent runs.
+  @@unique([userId, eventId])
+  @@index([userId, stationId, createdAt(sort: Desc)])
+}
+
+model FavoriteStation {
+  userId    String
+  stationId String
+  createdAt DateTime @default(now())
+
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  station FuelStation @relation(fields: [stationId], references: [id], onDelete: Cascade)
+
+  @@id([userId, stationId])
+}
+
+model SyncRun {
+  id              String    @id @default(uuid())
+  startedAt       DateTime  @default(now())
+  finishedAt      DateTime?
+  ok              Boolean   @default(false)
+  error           String?
+  sourceUpdatedAt DateTime?
+  stationCount    Int?
+  changes         Int?
+  events          Int?
+  notificationsSent Int?
+
+  @@index([startedAt(sort: Desc)])
+  @@index([ok, startedAt(sort: Desc)])
+}
+
+/// Simple fixed-window rate limiter storage (works across serverless instances).
+model RateLimit {
+  key       String   @id
+  count     Int
+  windowEnd DateTime
+}

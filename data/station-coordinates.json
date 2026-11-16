@@ -1,0 +1,29 @@
+{
+  "$comment": "Manually maintained station coordinates keyed by Shunkhlai externalId. Only add coordinates you have checked (e.g. on-site or via Google/OSM). Set verified=true only after visual confirmation. Entries with verified=false are shown with an 'unverified' label. Stations without an entry are listed but not drawn on the map.",
+  "stations": {
+    "1355": {
+      "lat": 47.908243,
+      "lng": 106.952029,
+      "verified": false,
+      "source": "osm:node/4426436408 (390 m from \"Нарантуул\")"
+    },
+    "1363": {
+      "lat": 47.956673,
+      "lng": 106.826131,
+      "verified": false,
+      "source": "osm:node/2084090883 (63 m from \"Баянхошуу\")"
+    },
+    "1372": {
+      "lat": 47.924401,
+      "lng": 106.97234,
+      "verified": false,
+      "source": "osm:node/4267809099 (130 m from \"Цайз зах\")"
+    },
+    "1374": {
+      "lat": 47.915658,
+      "lng": 106.969013,
+      "verified": false,
+      "source": "osm:node/5119776921 (107 m from \"Офицеруудын ордон\")"
+    }
+  }
+}
