@@ -2,13 +2,13 @@ import "server-only";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { env } from "@/lib/env";
-import { DISTRICT_CODES } from "@/lib/districts";
+import { ALL_DISTRICTS, DISTRICT_CODES } from "@/lib/districts";
 
 export const preferenceInput = z
   .object({
     latitude: z.number().min(41).max(53).nullable(), // Mongolia bounding box (rough)
     longitude: z.number().min(87).max(120).nullable(),
-    district: z.enum(DISTRICT_CODES),
+    district: z.enum([...DISTRICT_CODES, ALL_DISTRICTS]),
     notificationRadiusKm: z.number().min(0.5).max(50),
     telegramNotificationsEnabled: z.boolean(),
     notifyOnAvailable: z.boolean(),

@@ -2,6 +2,7 @@ import "server-only";
 import { z } from "zod";
 import { env } from "@/lib/env";
 import { isUlaanbaatar, parseDistrict, type DistrictCode } from "@/lib/districts";
+import { FUEL_TYPES, type FuelType } from "@/lib/fuels";
 
 /** Source is loosely typed; every field is validated and anything unexpected becomes "unknown". */
 const fuelSchema = z
@@ -23,7 +24,7 @@ const responseSchema = z.object({
   stations: z.record(z.string(), z.unknown()),
 });
 
-export type A92State = {
+export type FuelState = {
   available: boolean | null; // null = unknown / malformed
   arrivedAt: string | null;
   emptyAt: string | null;
@@ -37,8 +38,11 @@ export type ParsedStation = {
   address: string | null;
   district: DistrictCode | null;
   isUB: boolean;
-  a92: A92State;
+  a92: FuelState;
+  fuels: Record<FuelType, FuelState>;
 };
+
+export type A92State = FuelState;
 
 export type FuelSnapshot = { updatedAt: Date | null; stations: ParsedStation[]; skipped: number };
 
@@ -57,8 +61,8 @@ export function splitStationName(raw: string): { name: string; address: string |
   return { name: m[1].trim(), address: inner };
 }
 
-function parseA92(fuels: Record<string, unknown>): A92State {
-  const r = fuelSchema.safeParse(fuels.ai92);
+function parseFuel(value: unknown): FuelState {
+  const r = fuelSchema.safeParse(value);
   if (!r.success) return { available: null, arrivedAt: null, emptyAt: null, limitPerPerson: null };
   return {
     available: typeof r.data.available === "boolean" ? r.data.available : null,
@@ -86,7 +90,10 @@ export function parseFuelResponse(json: unknown): FuelSnapshot {
       address,
       district: parseDistrict(address),
       isUB: isUlaanbaatar(name, address),
-      a92: parseA92(s.data.fuels),
+      ...(() => {
+        const fuels = Object.fromEntries(FUEL_TYPES.map((f) => [f, parseFuel(s.data.fuels[f])])) as Record<FuelType, FuelState>;
+        return { fuels, a92: fuels.ai92 };
+      })(),
     });
   }
   const d = root.updatedAt ? new Date(root.updatedAt) : null;

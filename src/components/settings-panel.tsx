@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { DISTRICTS } from "@/lib/districts";
+import { ALL_DISTRICTS, DISTRICTS, districtName } from "@/lib/districts";
 import type { Dict, Lang } from "@/lib/i18n";
 import type { Preference } from "@/lib/me";
 import { cn } from "@/lib/utils";
@@ -62,6 +62,7 @@ export function SettingsPanel({ pref, onSave, pickMode, setPickMode, t, lang }: 
           onChange={(e) => onSave({ district: e.target.value })}
           className="border-input bg-background h-9 w-full rounded-md border px-2 text-sm"
         >
+          <option value={ALL_DISTRICTS}>{districtName(ALL_DISTRICTS, lang)}</option>
           {DISTRICTS.map((d) => (
             <option key={d.code} value={d.code}>
               {d[lang]}

@@ -1,7 +1,8 @@
 "use client";
 
 import { MapPin, Star, Navigation } from "lucide-react";
-import { StatusBadge } from "@/components/status";
+import { StatusBadge, StatusDot } from "@/components/status";
+import { FUEL_LABEL, FUEL_TYPES, type FuelType } from "@/lib/fuels";
 import { fmtKm, mapsHref, type StationWithDistance } from "@/components/types";
 import { districtName } from "@/lib/districts";
 import type { Dict, Lang } from "@/lib/i18n";
@@ -14,9 +15,10 @@ type Props = {
   favorite: boolean;
   onToggleFavorite: (id: string, fav: boolean) => void;
   onFocus: (s: StationWithDistance) => void;
+  fuel?: FuelType;
 };
 
-export function StationRow({ s, t, lang, favorite, onToggleFavorite, onFocus }: Props) {
+export function StationRow({ s, t, lang, favorite, onToggleFavorite, onFocus, fuel = "ai92" }: Props) {
   const hasCoords = s.lat != null && s.lng != null;
   return (
     <li className={cn("flex gap-3 rounded-lg border p-3", s.status === "available" && "border-green-600/40 bg-green-600/5")}>
@@ -30,6 +32,22 @@ export function StationRow({ s, t, lang, favorite, onToggleFavorite, onFocus }: 
           {s.address ?? districtName(s.district, lang) ?? "—"}
           {s.address && s.district && <span className="ml-1 opacity-70">· {districtName(s.district, lang)}</span>}
         </p>
+        <div className="flex flex-wrap gap-1">
+          {FUEL_TYPES.map((f) => (
+            <span
+              key={f}
+              title={`${FUEL_LABEL[f][lang]}${s.fuels[f].arrivedAt ? ` · ${t.arrived} ${s.fuels[f].arrivedAt}` : ""}`}
+              className={cn(
+                "inline-flex items-center gap-1 rounded border px-1.5 py-px text-[11px]",
+                f === fuel && "border-foreground/40 font-semibold",
+                s.fuels[f].status !== "available" && "text-muted-foreground",
+              )}
+            >
+              <StatusDot status={s.fuels[f].status} className="size-2" />
+              {FUEL_LABEL[f][lang]}
+            </span>
+          ))}
+        </div>
         <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs">
           {s.arrivedAt && <span>🕒 {t.arrived}: <b>{s.arrivedAt}</b></span>}
           {s.emptyAt && <span>⌛ {t.empty}: {s.emptyAt}</span>}

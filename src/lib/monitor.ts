@@ -5,14 +5,15 @@ import { env } from "@/lib/env";
 import { errMsg, log } from "@/lib/log";
 import { fetchFuelSnapshot, type ParsedStation } from "@/lib/fuel-api";
 import { STATION_COORDINATES } from "@/lib/station-coordinates";
-import { latestA92Rows } from "@/lib/stations";
+import { latestA92Rows, latestFuelRows } from "@/lib/stations";
+import { FUEL_TYPES } from "@/lib/fuels";
 import { distanceKm } from "@/lib/geo";
 import { ubDate } from "@/lib/time";
-import { prettifyAddress, type DistrictCode } from "@/lib/districts";
+import { inHomeDistrict, isUlaanbaatar, prettifyAddress, type DistrictCode } from "@/lib/districts";
 import { sendMessage, TelegramError } from "@/lib/telegram/api";
 import { formatArrivalTimeAlert, formatAvailableAlert } from "@/lib/telegram/format";
 
-const FUEL = "ai92"; // Euro-92 is deliberately never tracked or alerted.
+const FUEL = "ai92"; // the only fuel that triggers alerts
 const DISPATCH_WINDOW_MS = 15 * 60 * 1000; // events younger than this are (re)dispatched to users not yet notified
 
 export type MonitorResult =
@@ -130,6 +131,26 @@ async function persistSnapshot(parsed: ParsedStation[], runStartedAt: Date) {
     }
   }
 
+  // Other fuels: history only (displayed on the dashboard, never alerted).
+  const latestAll = await latestFuelRows();
+  for (const p of parsed) {
+    const station = existing.get(p.externalId);
+    if (!station) continue;
+    for (const fuel of FUEL_TYPES) {
+      if (fuel === FUEL) continue;
+      const cur = p.fuels[fuel];
+      if (cur.available === null) continue;
+      const prev = latestAll.get(station.id)?.get(fuel);
+      const same =
+        prev &&
+        prev.available === cur.available &&
+        prev.arrivedAt === cur.arrivedAt &&
+        prev.emptyAt === cur.emptyAt &&
+        prev.limitPerPerson === cur.limitPerPerson;
+      if (!same) history.push({ stationId: station.id, fuelType: fuel, ...cur, available: cur.available, recordedAt: runStartedAt });
+    }
+  }
+
   const created = await prisma.$transaction(async (tx) => {
     if (history.length) await tx.fuelAvailability.createMany({ data: history });
     return events.length ? tx.availabilityEvent.createManyAndReturn({ data: events, skipDuplicates: true }) : [];
@@ -177,7 +198,7 @@ async function loadRecipients(): Promise<Recipient[]> {
 /** Decide whether a user should hear about a station; returns distance (or null) when eligible, false otherwise. */
 export function matchRecipient(
   r: Pick<Recipient, "lat" | "lng" | "district" | "radiusKm" | "favoritesOnly" | "favorites">,
-  s: { id: string; latitude: number | null; longitude: number | null; district: string | null },
+  s: { id: string; latitude: number | null; longitude: number | null; district: string | null; isUB: boolean },
 ): { distanceKm: number | null } | false {
   const fav = r.favorites.has(s.id);
   const dist =
@@ -188,7 +209,7 @@ export function matchRecipient(
   if (fav) return { distanceKm: dist };
   if (dist != null) return dist <= r.radiusKm ? { distanceKm: dist } : false;
   // No precise distance possible (no home pin or station not geolocated): fall back to same district.
-  return s.district === r.district ? { distanceKm: null } : false;
+  return inHomeDistrict(s, r.district) ? { distanceKm: null } : false;
 }
 
 async function dispatchNotifications(): Promise<number> {
@@ -214,7 +235,7 @@ async function dispatchNotifications(): Promise<number> {
     for (const r of recipients) {
       if (already.has(r.userId)) continue;
       if (ev.type === "A92_AVAILABLE" ? !r.notifyOnAvailable : !r.notifyOnArrivalTime) continue;
-      const match = matchRecipient(r, ev.station);
+      const match = matchRecipient(r, { ...ev.station, isUB: isUlaanbaatar(ev.station.name, ev.station.address) });
       if (!match) continue;
 
       if (env.NOTIFICATION_COOLDOWN_MINUTES > 0) {

@@ -2,8 +2,16 @@ import "server-only";
 import { prisma } from "@/lib/db";
 import { STALE_AFTER_MS } from "@/lib/env";
 import { isUlaanbaatar, prettifyAddress, type DistrictCode } from "@/lib/districts";
+import { FUEL_TYPES, type FuelType } from "@/lib/fuels";
 
 export type A92Status = "available" | "unavailable" | "unknown";
+
+export type FuelView = {
+  status: A92Status;
+  arrivedAt: string | null;
+  emptyAt: string | null;
+  limitPerPerson: string | null;
+};
 
 export type StationView = {
   id: string;
@@ -20,6 +28,8 @@ export type StationView = {
   emptyAt: string | null;
   limitPerPerson: string | null;
   changedAt: string | null;
+  /** All fuels (ai92 duplicated in the top-level fields for convenience). */
+  fuels: Record<FuelType, FuelView>;
 };
 
 export type SyncInfo = {
@@ -50,6 +60,20 @@ export async function latestA92Rows(): Promise<Map<string, LatestRow & { id: str
   return new Map(rows.map((r) => [r.stationId, r]));
 }
 
+/** Latest row per (station, fuel) for every fuel type. */
+export async function latestFuelRows(): Promise<Map<string, Map<string, LatestRow>>> {
+  const rows = await prisma.$queryRaw<(LatestRow & { fuelType: string })[]>`
+    SELECT DISTINCT ON ("stationId", "fuelType") "stationId", "fuelType", available, "arrivedAt", "emptyAt", "limitPerPerson", "recordedAt"
+    FROM "FuelAvailability"
+    ORDER BY "stationId", "fuelType", "recordedAt" DESC`;
+  const out = new Map<string, Map<string, LatestRow>>();
+  for (const r of rows) {
+    if (!out.has(r.stationId)) out.set(r.stationId, new Map());
+    out.get(r.stationId)!.set(r.fuelType, r);
+  }
+  return out;
+}
+
 export async function getSyncInfo(): Promise<SyncInfo & { lastOkStartedAt: Date | null }> {
   const [ok, attempt] = await Promise.all([
     prisma.syncRun.findFirst({ where: { ok: true }, orderBy: { startedAt: "desc" } }),
@@ -66,18 +90,27 @@ export async function getSyncInfo(): Promise<SyncInfo & { lastOkStartedAt: Date 
 }
 
 export async function getStationsData(): Promise<StationsData> {
-  const [stations, latest, syncFull] = await Promise.all([
+  const [stations, latestAll, syncFull] = await Promise.all([
     prisma.fuelStation.findMany({ orderBy: { name: "asc" } }),
-    latestA92Rows(),
+    latestFuelRows(),
     getSyncInfo(),
   ]);
   const { lastOkStartedAt, ...sync } = syncFull;
 
   const views = stations.map((s): StationView => {
-    const row = latest.get(s.id);
+    const byFuel = latestAll.get(s.id);
+    const row = byFuel?.get("ai92");
     // Unknown when: data stale, station had no valid ai92 in the last successful sync, or never recorded.
     const missing = !s.lastSeenAt || !lastOkStartedAt || s.lastSeenAt < lastOkStartedAt;
-    const status: A92Status = !row || sync.stale || missing ? "unknown" : row.available ? "available" : "unavailable";
+    const statusOf = (r: LatestRow | undefined): A92Status =>
+      !r || sync.stale || missing ? "unknown" : r.available ? "available" : "unavailable";
+    const status = statusOf(row);
+    const fuels = Object.fromEntries(
+      FUEL_TYPES.map((f) => {
+        const r = byFuel?.get(f);
+        return [f, { status: statusOf(r), arrivedAt: r?.arrivedAt ?? null, emptyAt: r?.emptyAt ?? null, limitPerPerson: r?.limitPerPerson ?? null }];
+      }),
+    ) as Record<FuelType, FuelView>;
     return {
       id: s.id,
       externalId: s.externalId,
@@ -93,6 +126,7 @@ export async function getStationsData(): Promise<StationsData> {
       emptyAt: row?.emptyAt ?? null,
       limitPerPerson: row?.limitPerPerson ?? null,
       changedAt: row?.recordedAt.toISOString() ?? null,
+      fuels,
     };
   });
   return { stations: sortStations(views), sync };

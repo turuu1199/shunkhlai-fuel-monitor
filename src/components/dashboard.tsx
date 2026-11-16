@@ -13,8 +13,9 @@ import { SettingsPanel } from "@/components/settings-panel";
 import { TelegramPanel } from "@/components/telegram-panel";
 import type { Home, StationWithDistance } from "@/components/types";
 import { distanceKm } from "@/lib/geo";
-import { districtName } from "@/lib/districts";
+import { districtName, inHomeDistrict } from "@/lib/districts";
 import { DICT, type Lang } from "@/lib/i18n";
+import { FUEL_LABEL, FUEL_TYPES, type FuelType } from "@/lib/fuels";
 import type { Me, Preference } from "@/lib/me";
 import type { StationsData } from "@/lib/stations";
 import { cn } from "@/lib/utils";
@@ -45,6 +46,7 @@ export function Dashboard({ initialData, initialMe }: { initialData: StationsDat
   const lang: Lang = me.preference.language;
   const t = DICT[lang];
   const [pickMode, setPickMode] = useState(false);
+  const [fuel, setFuel] = useState<FuelType>("ai92");
   const [focus, setFocus] = useState<{ lat: number; lng: number } | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
 
@@ -138,16 +140,21 @@ export function Dashboard({ initialData, initialMe }: { initialData: StationsDat
     () =>
       data.stations.map((s) => ({
         ...s,
+        // Top-level status/details follow the selected fuel; all fuels stay in s.fuels.
+        status: s.fuels[fuel].status,
+        arrivedAt: s.fuels[fuel].arrivedAt,
+        emptyAt: s.fuels[fuel].emptyAt,
+        limitPerPerson: s.fuels[fuel].limitPerPerson,
         distanceKm: home && s.lat != null && s.lng != null ? distanceKm(home, { lat: s.lat, lng: s.lng }) : null,
       })),
-    [data.stations, home],
+    [data.stations, home, fuel],
   );
 
   const available = stations.filter((s) => s.status === "available");
   const nearby = useMemo(() => {
     const list = available.filter((s) =>
       favorites.has(s.id) ||
-      (home && s.distanceKm != null ? s.distanceKm <= pref.notificationRadiusKm : s.district === pref.district),
+      (home && s.distanceKm != null ? s.distanceKm <= pref.notificationRadiusKm : inHomeDistrict(s, pref.district)),
     );
     return list.sort((a, b) => (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity));
   }, [available, favorites, home, pref.notificationRadiusKm, pref.district]);
@@ -209,11 +216,31 @@ export function Dashboard({ initialData, initialMe }: { initialData: StationsDat
         </button>
       </header>
 
+      {/* Fuel selector */}
+      <div className="mb-3 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label={t.fuel}>
+        {FUEL_TYPES.map((f) => (
+          <button
+            key={f}
+            type="button"
+            role="tab"
+            aria-selected={fuel === f}
+            onClick={() => setFuel(f)}
+            className={cn(
+              "shrink-0 rounded-full border px-3 py-1.5 text-sm font-medium",
+              fuel === f ? "bg-primary text-primary-foreground border-primary" : "hover:bg-muted",
+            )}
+          >
+            ⛽ {FUEL_LABEL[f][lang]}
+            <span className="ml-1 text-xs opacity-70">{data.stations.filter((s) => s.isUB && s.fuels[f].status === "available").length}</span>
+          </button>
+        ))}
+      </div>
+
       {/* 2. Summary */}
       <section className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Stat label={`${t.total} (УБ)`} value={counts.total} />
-        <Stat label={t.available} value={counts.available} cls="text-green-600" />
-        <Stat label={t.unavailable} value={counts.unavailable} cls="text-red-600" />
+        <Stat label={`${FUEL_LABEL[fuel][lang]} — ${t.fAvailable}`} value={counts.available} cls="text-green-600" />
+        <Stat label={`${FUEL_LABEL[fuel][lang]} — ${t.fUnavailable}`} value={counts.unavailable} cls="text-red-600" />
         <Stat label={t.overall} value={overall.label} cls={overall.cls} small />
       </section>
 
@@ -249,7 +276,7 @@ export function Dashboard({ initialData, initialMe }: { initialData: StationsDat
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                📍 {t.nearby}
+                📍 {t.nearby.replace("АИ-92", FUEL_LABEL[fuel].mn).replace("A92", FUEL_LABEL[fuel].en)}
                 <span className="text-muted-foreground text-xs font-normal">
                   {home ? `≤ ${pref.notificationRadiusKm} ${t.km}` : districtName(pref.district, lang)}
                 </span>
@@ -259,7 +286,7 @@ export function Dashboard({ initialData, initialMe }: { initialData: StationsDat
               {nearby.length ? (
                 <ul className="space-y-2">
                   {nearby.slice(0, 8).map((s) => (
-                    <StationRow key={s.id} s={s} t={t} lang={lang} favorite={favorites.has(s.id)} onToggleFavorite={toggleFavorite} onFocus={focusStation} />
+                    <StationRow key={s.id} s={s} t={t} lang={lang} favorite={favorites.has(s.id)} onToggleFavorite={toggleFavorite} onFocus={focusStation} fuel={fuel} />
                   ))}
                 </ul>
               ) : (
@@ -269,7 +296,7 @@ export function Dashboard({ initialData, initialMe }: { initialData: StationsDat
                     <>
                       <p className="text-xs font-medium">{t.nearestElsewhere}:</p>
                       <ul>
-                        <StationRow s={nearestElsewhere} t={t} lang={lang} favorite={favorites.has(nearestElsewhere.id)} onToggleFavorite={toggleFavorite} onFocus={focusStation} />
+                        <StationRow s={nearestElsewhere} t={t} lang={lang} favorite={favorites.has(nearestElsewhere.id)} onToggleFavorite={toggleFavorite} onFocus={focusStation} fuel={fuel} />
                       </ul>
                     </>
                   )}
@@ -293,6 +320,8 @@ export function Dashboard({ initialData, initialMe }: { initialData: StationsDat
                 onFocus={focusStation}
                 t={t}
                 lang={lang}
+                homeDistrict={pref.district}
+                fuel={fuel}
               />
             </CardContent>
           </Card>

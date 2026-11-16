@@ -16,7 +16,11 @@ export const DISTRICT_CODES = DISTRICTS.map((d) => d.code) as [DistrictCode, ...
 
 export const DEFAULT_DISTRICT: DistrictCode = "BZD";
 
+/** Preference value meaning "every Ulaanbaatar district". */
+export const ALL_DISTRICTS = "ALL";
+
 export function districtName(code: string | null | undefined, lang: "mn" | "en" = "mn"): string | null {
+  if (code === ALL_DISTRICTS) return lang === "mn" ? "Бүх дүүрэг" : "All districts";
   const d = DISTRICTS.find((x) => x.code === code);
   return d ? `${d[lang]} ${lang === "mn" ? "дүүрэг" : "district"}` : null;
 }
@@ -56,4 +60,9 @@ export function prettifyAddress(address: string, district: DistrictCode | null):
 
 export function isUlaanbaatar(name: string, address: string | null): boolean {
   return /^УБ\s/u.test(name) || /УБ хот/u.test(address ?? "");
+}
+
+/** Does a station fall inside the user's home district preference ("ALL" = any Ulaanbaatar station)? */
+export function inHomeDistrict(s: { district: string | null; isUB: boolean }, pref: string): boolean {
+  return pref === ALL_DISTRICTS ? s.isUB : s.district === pref;
 }

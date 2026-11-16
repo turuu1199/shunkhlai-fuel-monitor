@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { StationRow } from "@/components/station-row";
 import type { StationWithDistance } from "@/components/types";
 import type { Dict, Lang } from "@/lib/i18n";
+import { ALL_DISTRICTS, districtName, inHomeDistrict } from "@/lib/districts";
+import type { FuelType } from "@/lib/fuels";
 import { cn } from "@/lib/utils";
 
 type Filter = "all" | "available" | "unavailable";
@@ -19,6 +21,8 @@ type Props = {
   onFocus: (s: StationWithDistance) => void;
   t: Dict;
   lang: Lang;
+  homeDistrict: string;
+  fuel: FuelType;
 };
 
 function Chip({ active, onClick, children, disabled }: { active: boolean; onClick: () => void; children: React.ReactNode; disabled?: boolean }) {
@@ -38,7 +42,7 @@ function Chip({ active, onClick, children, disabled }: { active: boolean; onClic
   );
 }
 
-export function StationList({ stations, hasHome, radiusKm, favorites, onToggleFavorite, onFocus, t, lang }: Props) {
+export function StationList({ stations, hasHome, radiusKm, favorites, onToggleFavorite, onFocus, t, lang, homeDistrict, fuel }: Props) {
   const [filter, setFilter] = useState<Filter>("all");
   const [bzd, setBzd] = useState(false);
   const [ubOnly, setUbOnly] = useState(true);
@@ -51,7 +55,7 @@ export function StationList({ stations, hasHome, radiusKm, favorites, onToggleFa
     let out = stations.filter(
       (s) =>
         (filter === "all" || s.status === filter) &&
-        (!bzd || s.district === "BZD") &&
+        (!bzd || inHomeDistrict(s, homeDistrict)) &&
         (!ubOnly || s.isUB) &&
         (!inRadius || !hasHome || (s.distanceKm != null && s.distanceKm <= radiusKm)) &&
         (!needle || s.name.toLowerCase().includes(needle) || (s.address ?? "").toLowerCase().includes(needle)),
@@ -60,7 +64,7 @@ export function StationList({ stations, hasHome, radiusKm, favorites, onToggleFa
       out = [...out].sort((a, b) => (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity));
     }
     return out;
-  }, [stations, filter, bzd, ubOnly, inRadius, hasHome, radiusKm, q, byDistance]);
+  }, [stations, filter, bzd, ubOnly, inRadius, hasHome, radiusKm, q, byDistance, homeDistrict]);
 
   const counts = {
     all: stations.length,
@@ -78,7 +82,9 @@ export function StationList({ stations, hasHome, radiusKm, favorites, onToggleFa
         <Chip active={filter === "all"} onClick={() => setFilter("all")}>{t.fAll} {counts.all}</Chip>
         <Chip active={filter === "available"} onClick={() => setFilter("available")}>🟢 {t.fAvailable} {counts.available}</Chip>
         <Chip active={filter === "unavailable"} onClick={() => setFilter("unavailable")}>🔴 {t.fUnavailable} {counts.unavailable}</Chip>
-        <Chip active={bzd} onClick={() => setBzd(!bzd)}>{t.fBZD}</Chip>
+        {homeDistrict !== ALL_DISTRICTS && (
+          <Chip active={bzd} onClick={() => setBzd(!bzd)}>🏠 {districtName(homeDistrict, lang)}</Chip>
+        )}
         <Chip active={ubOnly} onClick={() => setUbOnly(!ubOnly)}>{t.fUB}</Chip>
         <Chip active={byDistance && hasHome} disabled={!hasHome} onClick={() => setByDistance(!byDistance)}>↕ {t.sortDistance}</Chip>
         <Chip active={inRadius && hasHome} disabled={!hasHome} onClick={() => setInRadius(!inRadius)}>◎ {t.radiusFilter} ({radiusKm} {t.km})</Chip>
@@ -88,7 +94,7 @@ export function StationList({ stations, hasHome, radiusKm, favorites, onToggleFa
       ) : (
         <ul className="space-y-2">
           {list.map((s) => (
-            <StationRow key={s.id} s={s} t={t} lang={lang} favorite={favorites.has(s.id)} onToggleFavorite={onToggleFavorite} onFocus={onFocus} />
+            <StationRow key={s.id} s={s} t={t} lang={lang} favorite={favorites.has(s.id)} onToggleFavorite={onToggleFavorite} onFocus={onFocus} fuel={fuel} />
           ))}
         </ul>
       )}

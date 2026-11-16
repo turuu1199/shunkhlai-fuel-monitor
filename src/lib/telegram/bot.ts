@@ -5,7 +5,7 @@ import { env } from "@/lib/env";
 import { log, errMsg } from "@/lib/log";
 import { rateLimit } from "@/lib/rate-limit";
 import { distanceKm } from "@/lib/geo";
-import { districtName } from "@/lib/districts";
+import { districtName, inHomeDistrict } from "@/lib/districts";
 import { getStationsData, type StationView } from "@/lib/stations";
 import { escapeHtml as h, sendMessage, tgCall } from "@/lib/telegram/api";
 import { consumeConnectionToken } from "@/lib/telegram/connect";
@@ -189,13 +189,13 @@ async function cmdNearby(chatId: number) {
       if (withDist[0]) lines.push("", "Хамгийн ойр:", formatStationLine(withDist[0].s, withDist[0].d));
       lines.push("");
     }
-    const noCoords = av.filter((s) => s.lat == null && s.district === district);
+    const noCoords = av.filter((s) => s.lat == null && inHomeDistrict(s, district));
     if (noCoords.length) {
       lines.push(`ℹ️ ${h(districtName(district) ?? "")} — байршил тодорхойгүй ШТС:`);
       noCoords.forEach((s) => lines.push(formatStationLine(s), ""));
     }
   } else {
-    const inDistrict = av.filter((s) => s.district === district);
+    const inDistrict = av.filter((s) => inHomeDistrict(s, district));
     lines.push(`📍 <b>${h(districtName(district) ?? "")} — АИ-92</b>`, "");
     if (inDistrict.length) inDistrict.forEach((s) => lines.push(formatStationLine(s), ""));
     else lines.push("😕 Таны дүүрэгт одоогоор АИ-92 байхгүй байна.", "");

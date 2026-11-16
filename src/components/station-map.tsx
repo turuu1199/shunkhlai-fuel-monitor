@@ -7,6 +7,7 @@ import { STATUS_COLOR } from "@/components/status";
 import { fmtKm, mapsHref, type Home, type StationWithDistance } from "@/components/types";
 import { UB_MAP_CENTER, districtName } from "@/lib/districts";
 import type { Dict, Lang } from "@/lib/i18n";
+import { FUEL_LABEL, FUEL_TYPES } from "@/lib/fuels";
 
 type Props = {
   stations: StationWithDistance[];
@@ -73,11 +74,17 @@ export default function StationMap({ stations, home, radiusKm, pickMode, onPick,
             <div className="space-y-1 text-sm">
               <div className="font-semibold">{s.name}</div>
               <div className="text-xs opacity-80">{s.address ?? districtName(s.district, lang)}</div>
-              <div>
-                ⛽ АИ-92:{" "}
-                <b style={{ color: STATUS_COLOR[s.status] }}>
-                  {s.status === "available" ? t.fAvailable : s.status === "unavailable" ? t.fUnavailable : t.unknown}
-                </b>
+              <div className="space-y-0.5">
+                {FUEL_TYPES.map((f) => {
+                  const fs = s.fuels[f];
+                  return (
+                    <div key={f}>
+                      <span style={{ color: STATUS_COLOR[fs.status] }}>●</span> {FUEL_LABEL[f][lang]}:{" "}
+                      <b>{fs.status === "available" ? t.fAvailable : fs.status === "unavailable" ? t.fUnavailable : t.unknown}</b>
+                      {fs.arrivedAt && <span className="opacity-70"> · 🕒 {fs.arrivedAt}</span>}
+                    </div>
+                  );
+                })}
               </div>
               {s.arrivedAt && <div>🕒 {t.arrived}: {s.arrivedAt}</div>}
               {s.emptyAt && <div>⌛ {t.empty}: {s.emptyAt}</div>}
