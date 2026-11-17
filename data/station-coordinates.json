@@ -1,29 +1,491 @@
 {
   "$comment": "Manually maintained station coordinates keyed by Shunkhlai externalId. Only add coordinates you have checked (e.g. on-site or via Google/OSM). Set verified=true only after visual confirmation. Entries with verified=false are shown with an 'unverified' label. Stations without an entry are listed but not drawn on the map.",
   "stations": {
+    "1277": {
+      "lat": 47.320902,
+      "lng": 110.651964,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Хэнтий ШТС\")"
+    },
+    "1278": {
+      "lat": 46.681421,
+      "lng": 113.273667,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Сүхбаатар ШТС\")"
+    },
+    "1280": {
+      "lat": 48.065028,
+      "lng": 114.517349,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Дорнод ШТС\")"
+    },
+    "1281": {
+      "lat": 46.354626,
+      "lng": 108.381463,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Говьсүмбэр ШТС\")"
+    },
+    "1282": {
+      "lat": 44.89458,
+      "lng": 110.136722,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Сайншанд ШТС-1\")"
+    },
+    "1283": {
+      "lat": 44.90145,
+      "lng": 110.183972,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Сайншанд ШТС-2\")"
+    },
+    "1284": {
+      "lat": 43.711204,
+      "lng": 111.914318,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Замын-Үүд ШТС\")"
+    },
+    "1285": {
+      "lat": 45.764137,
+      "lng": 106.27595,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Дундговь ШТС\")"
+    },
+    "1287": {
+      "lat": 43.576832,
+      "lng": 104.424346,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Өмнөговь ШТС\")"
+    },
+    "1294": {
+      "lat": 43.018844,
+      "lng": 101.210845,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Гурван тэс ШТС-1\")"
+    },
+    "1295": {
+      "lat": 43.558607,
+      "lng": 105.552376,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Цогтцэций ШТС-2\")"
+    },
+    "1296": {
+      "lat": 43.327282,
+      "lng": 105.54139,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Цогтцэций ШТС-3\")"
+    },
+    "1298": {
+      "lat": 43.236055,
+      "lng": 106.443642,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Цагаанхад ШТС\")"
+    },
+    "1299": {
+      "lat": 49.378109,
+      "lng": 105.915354,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Дархан ШТС-1\")"
+    },
+    "1300": {
+      "lat": 49.463491,
+      "lng": 105.96932,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Дархан ШТС-2\")"
+    },
+    "1301": {
+      "lat": 49.497027,
+      "lng": 105.931362,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Дархан ШТС-3\")"
+    },
+    "1302": {
+      "lat": 49.478467,
+      "lng": 105.940857,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Дархан ШТС-4\")"
+    },
+    "1306": {
+      "lat": 50.229388,
+      "lng": 106.216856,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Сэлэнгэ ШТС-2\")"
+    },
+    "1307": {
+      "lat": 50.112196,
+      "lng": 105.454915,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Цагаан нуур ШТС\")"
+    },
+    "1308": {
+      "lat": 49.103781,
+      "lng": 105.550617,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Хөтөл ШТС\")"
+    },
+    "1309": {
+      "lat": 49.050678,
+      "lng": 104.139303,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Эрдэнэт ШТС-1\")"
+    },
+    "1310": {
+      "lat": 49.024542,
+      "lng": 104.06051,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Эрдэнэт ШТС-2\")"
+    },
+    "1311": {
+      "lat": 49.013383,
+      "lng": 104.020406,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Эрдэнэт ШТС-3\")"
+    },
+    "1312": {
+      "lat": 48.822785,
+      "lng": 103.519863,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Булган ШТС\")"
+    },
+    "1313": {
+      "lat": 49.396239,
+      "lng": 102.688206,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Хутаг-Өндөр ШТС\")"
+    },
+    "1314": {
+      "lat": 48.149464,
+      "lng": 99.9177636,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Тариат ШТС\")"
+    },
+    "1315": {
+      "lat": 48.753484,
+      "lng": 98.290242,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Тосонцэнгэл ШТС\")"
+    },
+    "1316": {
+      "lat": 47.738945,
+      "lng": 96.8523742,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Завхан ШТС-1\")"
+    },
+    "1320": {
+      "lat": 49.637326,
+      "lng": 100.157617,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Хөвсгөл ШТС-1\")"
+    },
+    "1321": {
+      "lat": 49.637361,
+      "lng": 100.151105,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Хөвсгөл ШТС-2\")"
+    },
+    "1322": {
+      "lat": 49.625707,
+      "lng": 100.161125,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Хөвсгөл ШТС-3\")"
+    },
+    "1323": {
+      "lat": 50.439424,
+      "lng": 100.162896,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Хатгал ШТС\")"
+    },
+    "1326": {
+      "lat": 47.771937,
+      "lng": 108.371786,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Багануур ШТС-1\")"
+    },
+    "1327": {
+      "lat": 47.771303,
+      "lng": 108.36479,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Багануур ШТС-2\")"
+    },
+    "1328": {
+      "lat": 47.487024,
+      "lng": 109.465,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Жаргалтхаан ШТС\")"
+    },
+    "1329": {
+      "lat": 47.666353,
+      "lng": 106.941374,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Өндөр Дов ШТС\")"
+    },
+    "1331": {
+      "lat": 48.225542,
+      "lng": 106.291164,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Баянчандмань ШТС\")"
+    },
+    "1332": {
+      "lat": 47.867233,
+      "lng": 105.259077,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Лүн ШТС\")"
+    },
+    "1333": {
+      "lat": 47.36756,
+      "lng": 103.937128,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Сансар ШТС\")"
+    },
+    "1334": {
+      "lat": 47.472765,
+      "lng": 101.455549,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Архангай ШТС\")"
+    },
+    "1335": {
+      "lat": 47.909076,
+      "lng": 100.65316,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Өлзийт ШТС\")"
+    },
+    "1336": {
+      "lat": 47.190541,
+      "lng": 102.84622,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Хархорин ШТС\")"
+    },
+    "1338": {
+      "lat": 46.265339,
+      "lng": 102.792072,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Өвөрхангай ШТС-1\")"
+    },
+    "1339": {
+      "lat": 46.26881,
+      "lng": 102.773457,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Өвөрхангай ШТС-2\")"
+    },
+    "1340": {
+      "lat": 46.46111,
+      "lng": 102.27403,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Уянга ШТС\")"
+    },
+    "1341": {
+      "lat": 46.89715,
+      "lng": 102.767299,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Хужирт ШТС\")"
+    },
+    "1342": {
+      "lat": 46.18323,
+      "lng": 100.720323,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Баянхонгор ШТС-1\")"
+    },
+    "1343": {
+      "lat": 46.182962,
+      "lng": 100.70689,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Баянхонгор ШТС-2\")"
+    },
+    "1344": {
+      "lat": 46.445173,
+      "lng": 96.2725342,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Алтай ШТС-1\")"
+    },
+    "1345": {
+      "lat": 46.401983,
+      "lng": 96.2524498,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Алтай ШТС-2\")"
+    },
+    "1346": {
+      "lat": 46.991594,
+      "lng": 93.4866417,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Дарви ШТС\")"
+    },
+    "1347": {
+      "lat": 47.051979,
+      "lng": 93.3239067,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Хөшөөт ШТС\")"
+    },
+    "1348": {
+      "lat": 47.538975,
+      "lng": 92.1691407,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Манхан ШТС\")"
+    },
+    "1349": {
+      "lat": 48.117615,
+      "lng": 91.5818871,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Жаргалант ШТС\")"
+    },
+    "1351": {
+      "lat": 49.984025,
+      "lng": 92.0747913,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Увс ШТС-1\")"
+    },
+    "1352": {
+      "lat": 49.978864,
+      "lng": 92.0790828,
+      "verified": true,
+      "source": "shunkhlai.mn (\"Увс ШТС-2\")"
+    },
+    "1354": {
+      "lat": 47.908645,
+      "lng": 106.903898,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-1\")"
+    },
     "1355": {
-      "lat": 47.908243,
-      "lng": 106.952029,
-      "verified": false,
-      "source": "osm:node/4426436408 (390 m from \"Нарантуул\")"
+      "lat": 47.908386,
+      "lng": 106.955429,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-2\")"
+    },
+    "1356": {
+      "lat": 47.926606,
+      "lng": 106.941911,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-3\")"
+    },
+    "1357": {
+      "lat": 47.900855,
+      "lng": 106.712324,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-4\")"
+    },
+    "1358": {
+      "lat": 47.907889,
+      "lng": 106.935162,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-5\")"
+    },
+    "1359": {
+      "lat": 47.896187,
+      "lng": 106.577141,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-6\")"
+    },
+    "1360": {
+      "lat": 47.928767,
+      "lng": 106.934937,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-7\")"
+    },
+    "1361": {
+      "lat": 47.910917,
+      "lng": 106.819419,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-8\")"
+    },
+    "1362": {
+      "lat": 48.002784,
+      "lng": 106.923736,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-9\")"
     },
     "1363": {
-      "lat": 47.956673,
-      "lng": 106.826131,
-      "verified": false,
-      "source": "osm:node/2084090883 (63 m from \"Баянхошуу\")"
+      "lat": 47.95667,
+      "lng": 106.826189,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-10\")"
+    },
+    "1364": {
+      "lat": 47.909438,
+      "lng": 106.804984,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-11\")"
+    },
+    "1365": {
+      "lat": 47.920035,
+      "lng": 106.796707,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-12\")"
+    },
+    "1366": {
+      "lat": 47.887335,
+      "lng": 107.071933,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-13\")"
+    },
+    "1367": {
+      "lat": 47.912952,
+      "lng": 106.999374,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-14\")"
+    },
+    "1368": {
+      "lat": 47.872512,
+      "lng": 106.834172,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-15\")"
+    },
+    "1370": {
+      "lat": 47.90236,
+      "lng": 106.856391,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-17\")"
+    },
+    "1371": {
+      "lat": 47.939919,
+      "lng": 106.913839,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-18\")"
     },
     "1372": {
-      "lat": 47.924401,
-      "lng": 106.97234,
-      "verified": false,
-      "source": "osm:node/4267809099 (130 m from \"Цайз зах\")"
+      "lat": 47.92436,
+      "lng": 106.972364,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-19\")"
+    },
+    "1373": {
+      "lat": 47.95976,
+      "lng": 106.93381,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-20\")"
     },
     "1374": {
-      "lat": 47.915658,
-      "lng": 106.969013,
-      "verified": false,
-      "source": "osm:node/5119776921 (107 m from \"Офицеруудын ордон\")"
+      "lat": 47.915692,
+      "lng": 106.969055,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-21\")"
+    },
+    "1376": {
+      "lat": 47.990105,
+      "lng": 106.937769,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-23\")"
+    },
+    "1377": {
+      "lat": 47.897683,
+      "lng": 106.818207,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-24\")"
+    },
+    "1378": {
+      "lat": 47.901104,
+      "lng": 106.785248,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-25\")"
+    },
+    "1379": {
+      "lat": 47.868194,
+      "lng": 106.822365,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-26\")"
+    },
+    "1380": {
+      "lat": 48.004895,
+      "lng": 106.924208,
+      "verified": true,
+      "source": "shunkhlai.mn (\"УБ ШТС-27\")"
     }
   }
 }
